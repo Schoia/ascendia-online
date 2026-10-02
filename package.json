@@ -1,0 +1,16 @@
+{
+  "name": "ascendia-online",
+  "version": "1.0.0",
+  "description": "A 3D browser action RPG in a 100-floor floating castle, with real-time multiplayer.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "license": "MIT"
+}
