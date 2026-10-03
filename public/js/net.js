@@ -3,6 +3,7 @@
 // peers(), onPeers(), on(), emit(), presence(), connected(), onConnection().
 (function () {
   'use strict';
+  if (window.claude && window.claude.use) return; // inside claude.ai the platform provides multiplayer
   const url = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
   let ws = null, myId = null, retry = 0, isConnected = false;
   const peers = new Map();            // id -> { presence, updatedAt }

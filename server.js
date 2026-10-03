@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 const PUBLIC = path.join(__dirname, 'public');
 const MAX_MSG = 4096;          // bytes per message
 const MAX_PER_SEC = 40;        // messages per client per second
-const ALLOWED_TOPICS = new Set(['chat', 'boss']);
+const ALLOWED_TOPICS = new Set(['chat', 'boss', 'announce', 'xp']);
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.ico': 'image/x-icon', '.json': 'application/json' };
 
