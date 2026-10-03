@@ -79,6 +79,14 @@ const THEMES = [
 ];
 const BOSS_NAMES = ['Grimjaw, Warden of the First Gate', 'Basalt Colossus', 'Sunscar Matriarch', 'Rimefang the Pale', 'Mirethorn Devourer', 'Ashen Reaver King', 'Gorehorn Ravager', 'Thornspire Tyrant', 'Glacier Juggernaut', 'The Tenth Sentinel'];
 const ELITE_PREFIX = ['Alpha', 'Elder', 'Savage', 'Dread', 'Ancient'];
+// Trophy names for boss rewards: [owner, sword, coat] for the first ten floors.
+const BOSS_TROPHY = [['Grimjaw', 'Tuskblade', 'Hide Mantle'], ['Basalt', 'Greatsword', 'Stoneweave Coat'], ['Sunscar', 'Scimitar', 'Dune Mantle'], ['Rimefang', 'Frostedge', 'Pale Coat'], ['Mirethorn', 'Thornblade', 'Bog Mantle'],
+  ['Reaver', 'Oathblade', 'Ashen Coat'], ['Gorehorn', 'Cleaver', 'Horned Mantle'], ['Thornspire', 'Saber', 'Briar Coat'], ['Glacier', 'Heartblade', 'Rime Mantle'], ['Sentinel', 'Fang', 'Warden Coat']];
+function bossTrophy(n, bossName) {
+  if (n >= 1 && n <= BOSS_TROPHY.length) return BOSS_TROPHY[n - 1];
+  const owner = bossName.split(',')[0].split(' ').find(w => !/^(the|of)$/i.test(w)) || 'Guardian';
+  return [owner, ['Fang', 'Edge', 'Brand', 'Oathblade', 'Saber'][n % 5], ['Mantle', 'Battlecoat', 'Longcoat'][n % 3]];
+}
 const WEAPONS = [
   { n: 'Worn Shortsword', atk: 5, price: 0, fl: 1 }, { n: 'Iron Longsword', atk: 9, price: 280, fl: 1 }, { n: 'Steel Saber', atk: 15, price: 850, fl: 2 },
   { n: 'Silvered Edge', atk: 23, price: 2100, fl: 3 }, { n: 'Moonsteel Blade', atk: 33, price: 4600, fl: 5 }, { n: 'Starforged Sword', atk: 46, price: 8800, fl: 8 },
@@ -118,7 +126,8 @@ function loadSave() {
   if (!o || !o.name) return null;
   const s = Object.assign(defaults(), o);
   if (!Array.isArray(s.armors) || !s.armors.length) s.armors = defaults().armors;
-  s.weapons.forEach(w => { if (w.plus == null) w.plus = 0; });
+  s.weapons.forEach(w => { if (w.plus == null) w.plus = 0; if (w.unique) w.n = w.n.replace(/^The's /, "Sentinel's ").replace(/'s Crown$/, "'s Heartblade"); });
+  s.armors.forEach(a => { if (a.unique) a.n = a.n.replace(/^The's /, "Sentinel's "); });
   return s;
 }
 function writeSave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }

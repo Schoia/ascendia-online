@@ -297,12 +297,12 @@ function finishKill(m) {
 }
 function rollWeapon(isBoss) {
   const tier = WEAPONS.filter(w => w.fl <= Math.max(1, F.n)).pop(); const adj = ['Keen', 'Tempered', 'Runed', 'Gleaming', 'Vicious', 'Balanced'], nouns = ['Longsword', 'Saber', 'Blade', 'Edge', 'Brand'];
-  if (isBoss) return { n: `${F.bossName.split(',')[0].split(' ')[0]}'s ${['Fang', 'Edge', 'Brand', 'Oath', 'Crown'][F.n % 5]}`, atk: Math.round(tier.atk * 1.35 + F.n * 3), plus: 0, unique: true };
+  if (isBoss) { const t = bossTrophy(F.n, F.bossName); return { n: `${t[0]}'s ${t[1]}`, atk: Math.round(tier.atk * 1.35 + F.n * 3), plus: 0, unique: true }; }
   return { n: `${adj[(Math.random() * adj.length) | 0]} ${nouns[(Math.random() * nouns.length) | 0]}`, atk: Math.round(tier.atk * 1.12 + Math.random() * 3), plus: 0 };
 }
 function rollArmor(isBoss) {
   const tier = ARMORS.filter(a => a.fl <= Math.max(1, F.n)).pop();
-  if (isBoss) return { n: `${F.bossName.split(',')[0].split(' ')[0]}'s Mantle`, def: Math.round(tier.def * 1.35 + F.n * 2), t: Math.min(5, tier.t + 1), plus: 0, unique: true };
+  if (isBoss) { const t = bossTrophy(F.n, F.bossName); return { n: `${t[0]}'s ${t[2]}`, def: Math.round(tier.def * 1.35 + F.n * 2), t: Math.min(5, tier.t + 1), plus: 0, unique: true }; }
   return { n: ['Warded', 'Sturdy', 'Lined', 'Reinforced'][(Math.random() * 4) | 0] + ' ' + ['Longcoat', 'Battlecoat', 'Mantle'][(Math.random() * 3) | 0], def: Math.round(tier.def * 1.12 + Math.random() * 2), t: tier.t, plus: 0 };
 }
 function gainXp(x, quiet) {
@@ -782,8 +782,9 @@ function renderMenu() {
       ${ms.map(([k, v]) => itemRow('#c8a070', `${esc(k)} × ${v}`, 'Material. Dalla the blacksmith uses it to enhance gear; Brenn buys it.')).join('')}
       ${ms.length ? '' : '<div class="empty">No materials yet. Monsters drop them when defeated.</div>'}</div>`;
   } else if (winTab === 'equip') {
-    B.innerHTML = `<h3 class="sec">Swords</h3><div class="list">${S.weapons.map((w, i) => `<div class="row ${i === S.eq ? 'eq' : ''}"><span class="ic" style="--c:${w.unique ? '#ffd870' : '#cfe6ff'}"></span><div class="tx"><b>${esc(itemName(w))}</b><small>ATK ${wAtk(w)}${w.unique ? ' · boss reward' : ''}</small></div>${i === S.eq ? '<span class="pr on">Equipped</span>' : `<button class="btn small ghost" data-w="${i}">Equip</button>`}</div>`).join('')}</div>
-      <h3 class="sec">Coats</h3><div class="list">${S.armors.map((a, i) => `<div class="row ${i === S.aeq ? 'eq' : ''}"><span class="ic" style="--c:${a.unique ? '#ffd870' : '#a8c8ff'}"></span><div class="tx"><b>${esc(itemName(a))}</b><small>DEF ${aDef(a)} · look tier ${a.t || 0}${a.unique ? ' · boss reward' : ''}</small></div>${i === S.aeq ? '<span class="pr on">Equipped</span>' : `<button class="btn small ghost" data-a="${i}">Equip</button>`}</div>`).join('')}</div>`;
+    const byPower = (list, eqi, pow) => list.map((it, i) => [it, i]).sort((x, y) => (y[1] === eqi) - (x[1] === eqi) || pow(y[0]) - pow(x[0]));
+    B.innerHTML = `<h3 class="sec">Swords</h3><div class="list">${byPower(S.weapons, S.eq, wAtk).map(([w, i]) => `<div class="row ${i === S.eq ? 'eq' : ''}"><span class="ic" style="--c:${w.unique ? '#ffd870' : '#cfe6ff'}"></span><div class="tx"><b>${esc(itemName(w))}</b><small>ATK ${wAtk(w)}${w.unique ? ' · boss reward' : ''}</small></div>${i === S.eq ? '<span class="pr on">Equipped</span>' : `<button class="btn small ghost" data-w="${i}">Equip</button>`}</div>`).join('')}</div>
+      <h3 class="sec">Coats</h3><div class="list">${byPower(S.armors, S.aeq, aDef).map(([a, i]) => `<div class="row ${i === S.aeq ? 'eq' : ''}"><span class="ic" style="--c:${a.unique ? '#ffd870' : '#a8c8ff'}"></span><div class="tx"><b>${esc(itemName(a))}</b><small>DEF ${aDef(a)} · look tier ${a.t || 0}${a.unique ? ' · boss reward' : ''}</small></div>${i === S.aeq ? '<span class="pr on">Equipped</span>' : `<button class="btn small ghost" data-a="${i}">Equip</button>`}</div>`).join('')}</div>`;
     B.querySelectorAll('button[data-w]').forEach(b => { b.onclick = () => { S.eq = +b.dataset.w; SFX.ui(); writeSave(); renderMenu(); }; });
     B.querySelectorAll('button[data-a]').forEach(b => { b.onclick = () => { S.aeq = +b.dataset.a; SFX.ui(); setAvatar(); writeSave(); renderMenu(); }; });
   } else if (winTab === 'skills') {
